@@ -8,6 +8,8 @@ project(
   LANGUAGES CXX
   VERSION ${SKBUILD_PROJECT_VERSION})
 
+message(STATUS "${CMAKE_CURRENT_DIR}")
+
 # Download headers
 include(FetchContent)
 set(AWKWARD_VERSION "v2.4.3")
@@ -29,8 +31,8 @@ find_package(Python COMPONENTS Interpreter Development.Module)
 find_package(pybind11 CONFIG)
 
 # Build demo module
-pybind11_add_module(demo demo.cpp)
-target_link_libraries(demo PRIVATE awkward::layout-builder)
+pybind11_add_module(uplcio_cpp uplcio_cpp.cpp)
+target_link_libraries(uplcio_cpp PRIVATE awkward::layout-builder)
 
 # Install into wheel
-install(TARGETS demo DESTINATION .)
+install(TARGETS uplcio_cpp DESTINATION .)

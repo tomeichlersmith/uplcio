@@ -117,7 +117,7 @@ py::object create_demo_array() {
 }
 
 
-PYBIND11_MODULE(demo, m) {
+PYBIND11_MODULE(uplcio_cpp, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
     m.def("create_demo_array", &create_demo_array, "A function that creates an awkward array");
 }

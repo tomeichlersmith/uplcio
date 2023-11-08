@@ -3,8 +3,8 @@ requires = ["scikit-build-core[pyproject]", "pybind11"]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "demo"
-version = "0.0.1"
+name = "uplcio_cpp"
+version = "0"
 
 dependencies = [
   'awkward>=2.0',
