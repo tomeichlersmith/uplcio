@@ -27,13 +27,19 @@ if(NOT awkward-headers_POPULATED)
 endif()
 
 # Load interpreter & pybind11
-find_package(Python COMPONENTS Interpreter Development.Module)
-find_package(pybind11 CONFIG)
+find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+find_package(pybind11 CONFIG REQUIRED)
+
+option(LCIO_DIR "Path to LCIO C++ installation to build with" $ENV{LCIO_DIR})
+find_path(LCIO_INCLUDE_DIR lcio.h ${LCIO_DIR}/include)
+find_library(LCIO_LIBRARY lcio ${LCIO_DIR}/lib)
+find_library(SIO_LIBRARY sio ${LCIO_DIR}/lib)
+set(LCIO_LIBRARIES ${LCIO_LIBRARY} ${SIO_LIBRARY})
 
 # Build demo module
-pybind11_add_module(uplcio_cpp src/uplcio_cpp.cpp src/demo.cpp)
-target_link_libraries(uplcio_cpp PRIVATE awkward::layout-builder)
-target_include_directories(uplcio_cpp PRIVATE src)
+pybind11_add_module(uplcio_cpp src/uplcio_cpp.cpp src/demo.cpp src/ReadOnlyFile.cpp)
+target_link_libraries(uplcio_cpp PRIVATE awkward::layout-builder ${LCIO_LIBRARIES})
+target_include_directories(uplcio_cpp PRIVATE src ${LCIO_INCLUDE_DIR})
 
 # Install into wheel
 install(TARGETS uplcio_cpp DESTINATION .)

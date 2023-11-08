@@ -23,42 +23,9 @@ Roughly in order, may not be tackled in order if other roadblocks or new ideas a
 
 Generally, I'm thinking we will have two python packages similar to how awkward itself is structured: an underlying package consisting of bound C++ for the heavy-duty functions and an interface package wrapping these strict/complicated functions with easier to use, more flexible, and type-checking ones.
 
-### `uplcio_cpp`
+### [uplcio_cpp](./uplcio_cpp)
 
 The pybind11-C++ underlying package.
-
-`ReadOnlyFile`: C++ class we bind to Python to read LCIO files, below are its public member functions that are bound as well
-
-- `ReadOnlyFile`: constructor
-    - allocate LCIO reader, open input file, and load the names of the collections from the file
-    - args:
-        - `std::string filepath` location of LCIO file to read
-        - `bool first_or_all` choose if we should load collections from all events (true) or only from the first event (false)
-- `~ReadOnlyFile`: destructor
-    - make sure to close LCIO file and de-allocate the reader
-
-- `get_collections`: get all the collections names
-    - return: `std::vector<std::string>` -> `List[str]`
-    - args
-        -  `bool first_or_all` choose to how retrieve collections
-            - `true` would be just get them from the first event, faster but potentially incorrect, while `false` would be explicitly scan the event headers of all events to make sure we get all of the collections
-- `load_collections`: actually load data into memory
-    - return: `py::object` -> `ak.Array`
-    - args
-        - `std::vector<std::string> to_load` list of collection names to load
-        - `int n_skip` number of events to skip before starting to read and create array
-        - `int max_read` maximum number of events to read before returning early, can be `-1` to signal that we should read all the events
-        - `bool none_is_empty` silently set any missing collections to the empty collection, if `false` raise an exception if a missing collection is found
-- `get_num_events`: get the number of events in the file
-    - return: `int`
-    - no args
-- `get_num_runs`: get the number of runs in the file
-    - return: `int`
-    - no args
-- `get_runs`: load the run headers into memory
-    - return: `py::object` -> `ak.Array`
-    - args
-        - maybe some selection args?
 
 ### `uplcio`
 
