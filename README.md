@@ -2,6 +2,16 @@ Load LCIO files directly into in-memory awkward arrays.
 
 The on-disk bit format is not well documented, I literally can't find it anywhere, so I think that means we will have to fall back to using the LCIO C++ library itself in a backend python module. This isn't a large loss since Awkward has a header-only distribution of "builders" that can be put into a python module via pybind11.
 
+## Roadmap
+Roughly in order, may not be tackled in order if other roadblocks or new ideas arise.
+- [x] set up two-tier package structure a la awkward
+- [ ] _Assuming system install of LCIO_, read run and event headers
+- [ ] _Assuming system install of LCIO_, read object collections
+- [ ] pass `LCIO_DIR` into `uplcio_cpp` build
+- [ ] add LCIO as another `FetchContent` option
+- [ ] LCIO schema evolution - can one build of `uplcio_cpp` handle multiple LCIO schema versions?
+- [ ] read LCRelations and put their pointer behavior into `ak.behavior` somehow
+
 ## Resources
 
 - [iLCSoft/LCIO](https://github.com/ilCSoft/lcio)
