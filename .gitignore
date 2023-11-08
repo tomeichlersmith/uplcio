@@ -8,5 +8,8 @@
 # building directory
 build/
 
+# python bytecode cache
+**.pyc
+
 # file editing buffer
 **.swp

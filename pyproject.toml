@@ -1,0 +1,27 @@
+[build-system]
+requires = [
+    "hatchling>=1.10.0",
+    "hatch-fancy-pypi-readme"
+]
+build-backend = "hatchling.build"
+
+[project]
+name = "uplcio"
+version = "0.0.0"
+description = "Load data from LCIO files into awkward arrays"
+requires-python = ">=3.8"
+authors = [
+  { name = "Tom Eichlersmith", email = "eichl008@umn.edu" }
+]
+classifiers = [
+]
+dependencies = [
+  "uplcio_cpp==0",
+  "awkward>=2"
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest >=6.0",
+]
+
