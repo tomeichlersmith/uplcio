@@ -31,8 +31,9 @@ find_package(Python COMPONENTS Interpreter Development.Module)
 find_package(pybind11 CONFIG)
 
 # Build demo module
-pybind11_add_module(uplcio_cpp uplcio_cpp.cpp)
+pybind11_add_module(uplcio_cpp src/uplcio_cpp.cpp src/demo.cpp)
 target_link_libraries(uplcio_cpp PRIVATE awkward::layout-builder)
+target_include_directories(uplcio_cpp PRIVATE src)
 
 # Install into wheel
 install(TARGETS uplcio_cpp DESTINATION .)
