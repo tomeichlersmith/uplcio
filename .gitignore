@@ -1,4 +1,5 @@
 # home-like stuff from running the denv
+.bash_history
 .bash_logout
 .bashrc
 .cache/
