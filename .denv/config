@@ -1,0 +1,4 @@
+denv_name="uplcio"
+denv_image="tomeichlersmith/hps-env:v3.3.1"
+denv_shell="/bin/bash -i"
+denv_mounts=""

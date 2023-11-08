@@ -1,0 +1,12 @@
+# home-like stuff from running the denv
+.bash_logout
+.bashrc
+.cache/
+.local/
+.profile
+
+# building directory
+build/
+
+# file editing buffer
+**.swp
