@@ -5,12 +5,16 @@
 .cache/
 .local/
 .profile
+.python_history
 
 # building directory
 build/
 
 # python bytecode cache
 **.pyc
+
+# pytest
+.pytest_cache
 
 # file editing buffer
 **.swp
