@@ -10,7 +10,7 @@
  */
 class ReadOnlyFile {
   /// our reader instance
-  lcio::LCReader* reader_;
+  std::unique_ptr<lcio::LCReader> reader_;
   /// list of collections in our file
   std::vector<std::string> collections_;
  public:

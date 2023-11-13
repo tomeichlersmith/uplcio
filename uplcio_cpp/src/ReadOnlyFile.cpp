@@ -3,12 +3,7 @@
 ReadOnlyFile::ReadOnlyFile(
     const std::string& filepath,
     bool use_only_first_event_for_collections
-) {
-  /**
-   * This factory just creates an SIOReader and up-casts to
-   * its abstract base class LCReader upon return.
-   */
-  reader_ = lcio::LCFactory::getInstance()->createLCReader(); 
+): reader_{lcio::LCFactory::getInstance()->createLCReader()} {
   /**
    * We might want to use a non-default set of LCReader flags
    * to better optimize our reading style.
