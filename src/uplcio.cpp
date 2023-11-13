@@ -125,11 +125,8 @@ class MCParticle : public Branch {
   > builder_;
   static std::map<std::size_t, std::string> field_names;
  public:
-  MCParticle(): builder_{field_names} {
-    std::cout << "creating MCParticle" << std::endl;
-  }
+  MCParticle(): builder_{field_names} {}
   void append(lcio::LCCollection* coll) final override {
-    std::cout << "appending to MCParticle" << std::endl;
     auto &list = builder_.field<Field::id>().begin_list();
     for (std::size_t i{0}; i < coll->getNumberOfElements(); i++) {
       EVENT::MCParticle* particle{dynamic_cast<EVENT::MCParticle*>(coll->getElementAt(i))};
@@ -164,7 +161,6 @@ py::object from_lcio(const std::string& f) {
     std::cout << collections->size() << std::endl;
     for (const std::string& name : *collections) {
       lcio::LCCollection* collection = evt->getCollection(name);
-      std::cout << collection->getTypeName() << std::endl;
       if (collection->getTypeName() == EVENT::LCIO::MCPARTICLE) {
         branches.emplace(name, std::make_unique<MCParticle>());
         branches[name]->append(collection);
@@ -179,7 +175,9 @@ py::object from_lcio(const std::string& f) {
   while((evt = lc_reader_->readNextEvent()) != 0 and nevents++ < 10000) {
     branches["header"]->append(evt, "");
     for (const std::string& name : *(evt->getCollectionNames())) {
-      branches[name]->append(evt, name);
+      if (branches.find(name) != branches.end()) {
+        branches[name]->append(evt, name);
+      }
     }
   }
   std::cout << " closing file" << std::endl;
@@ -188,6 +186,7 @@ py::object from_lcio(const std::string& f) {
   std::cout << "converting builders to ak.Arrays" << std::endl;
   std::map<std::string,py::object> conv_branches;
   for (auto it = branches.begin(); it != branches.end(); ++it) {
+    std::cout << "  " << it->first << std::endl;
     conv_branches[it->first] = it->second->snapshot();
   }
   auto zip = py::module::import("awkward").attr("zip");
@@ -195,7 +194,7 @@ py::object from_lcio(const std::string& f) {
   return zip(conv_branches);
 }
 
-PYBIND11_MODULE(demo, m) {
+PYBIND11_MODULE(uplcio, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
     m.def("from_lcio", &from_lcio, "can we open an lcio file?");
 }
