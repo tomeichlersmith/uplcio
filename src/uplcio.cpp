@@ -73,7 +73,10 @@ using NumpyBuilder = awkward::LayoutBuilder::Numpy<PRIMITIVE>;
 class Branch {
  public:
   virtual ~Branch() = default;
-  virtual void append(lcio::LCEvent* evt) = 0;
+  virtual void append(lcio::LCCollection* coll) = 0;
+  virtual void append(lcio::LCEvent* evt, const std::string& name) {
+    append(evt->getCollection(name));
+  }
   virtual py::object snapshot() = 0;
 };
 
@@ -93,6 +96,7 @@ class EventHeader : public Branch {
   static std::map<std::size_t,std::string> field_names;
  public:
   EventHeader(): builder_{field_names} {}
+  void append(lcio::LCCollection*) final override {}
   void append(lcio::LCEvent* evt) final override {
     builder_.field<Field::number>().append(evt->getEventNumber());
     builder_.field<Field::run>().append(evt->getRunNumber());
@@ -110,6 +114,29 @@ std::map<std::size_t,std::string> EventHeader::field_names = {
   {Field::weight, "weight"}
 };
 
+class MCParticle : public Branch {
+  enum Field : std::size_t {
+    id
+  };
+  RecordBuilder<
+    RecordField<Field::id, ListOffsetBuilder<std::size_t, NumpyBuilder<long unsigned int>>>
+  > builder_;
+  static std::map<std::size_t, std::string> field_names;
+ public:
+  MCParticle(): builder_{field_names} {}
+  void append(lcio::LCCollection* coll) final override {
+    builder_.field<Field::id>().begin_list();
+    builder_.field<Field::id>().end_list();
+  }
+  py::object snapshot() final override {
+    return snapshot_builder(builder_);
+  }
+};
+std::map<std::size_t,std::string> MCParticle::field_names = {
+  {Field::id, "id"}
+};
+
+
 /**
  * can we open an lcio file?
  */
@@ -123,17 +150,36 @@ py::object from_lcio(const std::string& f) {
   std::size_t nevents{0};
   std::map<std::string, std::unique_ptr<Branch>> branches;
   branches.emplace("header", std::make_unique<EventHeader>());
+  if ((evt = lc_reader_->readNextEvent()) != 0) {
+    const std::vector<std::string>* collections = evt->getCollectionNames();
+    for (const std::string& name : *collections) {
+      lcio::LCCollection* collection = evt->getCollection(name);
+      if (collection->getTypeName() == LCIO::MCPARTICLE) {
+        branches.emplace(name, std::make_unique<MCParticle>());
+        branches[name]->append(collection);
+      } else {
+        std::cerr << "WARN: " << name << " of type " << collection->getTypeName() << " not implemented."
+      }
+    }
+  } else {
+    throw std::runtime_error("Unable to read a single event from lcio file.");
+  }
   while((evt = lc_reader_->readNextEvent()) != 0 and nevents++ < 10000) {
     branches["header"]->append(evt);
+    for (const std::string& name : *(evt->getCollectionNames())) {
+      branches[name]->append(evt, name);
+    }
   }
   std::cout << " closing file" << std::endl;
   lc_reader_->close();
   std::cout << "leaving" << std::endl;
+  std::cout << "converting builders to ak.Arrays" << std::endl;
   std::map<std::string,py::object> conv_branches;
   for (auto it = branches.begin(); it != branches.end(); ++it) {
     conv_branches[it->first] = it->second->snapshot();
   }
   auto zip = py::module::import("awkward").attr("zip");
+  std::cout << "zipping up" << std::endl;
   return zip(conv_branches);
 }
 

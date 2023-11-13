@@ -33,8 +33,17 @@ find_package(pybind11 CONFIG)
 #find_package(LCIO REQUIRED)
 
 # Build demo module
-pybind11_add_module(demo demo.cpp)
-target_link_libraries(demo PRIVATE awkward::layout-builder "/usr/local/lib/liblcio.so" "/usr/local/lib/libsio.so")
+pybind11_add_module(
+  uplcio 
+  src/uplcio.cpp
+)
+target_link_libraries(
+  uplcio
+  PRIVATE 
+    awkward::layout-builder 
+    "/usr/local/lib/liblcio.so" 
+    "/usr/local/lib/libsio.so"
+)
 
 # Install into wheel
-install(TARGETS demo DESTINATION .)
+install(TARGETS uplcio DESTINATION .)
