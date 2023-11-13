@@ -7,6 +7,8 @@
 #include <IO/LCReader.h>
 #include <IOIMPL/LCFactory.h>
 #include <EVENT/LCEvent.h>
+#include <EVENT/LCCollection.h>
+#include <EVENT/MCParticle.h>
 
 namespace py = pybind11;
 
@@ -97,7 +99,7 @@ class EventHeader : public Branch {
  public:
   EventHeader(): builder_{field_names} {}
   void append(lcio::LCCollection*) final override {}
-  void append(lcio::LCEvent* evt) final override {
+  void append(lcio::LCEvent* evt, const std::string& name) final override {
     builder_.field<Field::number>().append(evt->getEventNumber());
     builder_.field<Field::run>().append(evt->getRunNumber());
     builder_.field<Field::timestamp>().append(evt->getTimeStamp());
@@ -123,9 +125,16 @@ class MCParticle : public Branch {
   > builder_;
   static std::map<std::size_t, std::string> field_names;
  public:
-  MCParticle(): builder_{field_names} {}
+  MCParticle(): builder_{field_names} {
+    std::cout << "creating MCParticle" << std::endl;
+  }
   void append(lcio::LCCollection* coll) final override {
-    builder_.field<Field::id>().begin_list();
+    std::cout << "appending to MCParticle" << std::endl;
+    auto &list = builder_.field<Field::id>().begin_list();
+    for (std::size_t i{0}; i < coll->getNumberOfElements(); i++) {
+      EVENT::MCParticle* particle{dynamic_cast<EVENT::MCParticle*>(coll->getElementAt(i))};
+      list.append(particle->id());
+    }
     builder_.field<Field::id>().end_list();
   }
   py::object snapshot() final override {
@@ -152,20 +161,23 @@ py::object from_lcio(const std::string& f) {
   branches.emplace("header", std::make_unique<EventHeader>());
   if ((evt = lc_reader_->readNextEvent()) != 0) {
     const std::vector<std::string>* collections = evt->getCollectionNames();
+    std::cout << collections->size() << std::endl;
     for (const std::string& name : *collections) {
       lcio::LCCollection* collection = evt->getCollection(name);
-      if (collection->getTypeName() == LCIO::MCPARTICLE) {
+      std::cout << collection->getTypeName() << std::endl;
+      if (collection->getTypeName() == EVENT::LCIO::MCPARTICLE) {
         branches.emplace(name, std::make_unique<MCParticle>());
         branches[name]->append(collection);
       } else {
         std::cerr << "WARN: " << name << " of type " << collection->getTypeName() << " not implemented."
+          << std::endl;
       }
     }
   } else {
     throw std::runtime_error("Unable to read a single event from lcio file.");
   }
   while((evt = lc_reader_->readNextEvent()) != 0 and nevents++ < 10000) {
-    branches["header"]->append(evt);
+    branches["header"]->append(evt, "");
     for (const std::string& name : *(evt->getCollectionNames())) {
       branches[name]->append(evt, name);
     }
