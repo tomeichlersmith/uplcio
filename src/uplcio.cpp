@@ -157,6 +157,7 @@ py::object from_lcio(const std::string& f) {
   std::map<std::string, std::unique_ptr<Branch>> branches;
   branches.emplace("header", std::make_unique<EventHeader>());
   if ((evt = lc_reader_->readNextEvent()) != 0) {
+    branches["header"]->append(evt, "");
     const std::vector<std::string>* collections = evt->getCollectionNames();
     std::cout << collections->size() << std::endl;
     for (const std::string& name : *collections) {
