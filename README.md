@@ -7,15 +7,17 @@ The on-disk bit format is not well documented, I literally can't find it anywher
 ## Roadmap
 Roughly in order, may not be tackled in order if other roadblocks or new ideas arise.
 - [x] set up two-tier package structure a la awkward
-_Assuming system install of LCIO_
+
+### _Assuming system install of LCIO_
 - [x] read event headers written by simjob
 - [ ] read run headers written by simjob
 - [ ] read collection names (and their types)
 - [ ] select events by index range
-_Expanding Usability_
+
+### _Expanding Usability_
 - [ ] pass `LCIO_DIR` into `uplcio_cpp` build
 - [ ] add LCIO as another `FetchContent` option
-- [ ] LCIO schema evolution - can one build of `uplcio_cpp` handle multiple LCIO schema versions?
+- [ ] investigate LCIO schema evolution - can one build of `uplcio_cpp` handle multiple LCIO schema versions?
 - [ ] read LCRelations and put their pointer behavior into `ak.behavior` somehow
 
 ## Resources
