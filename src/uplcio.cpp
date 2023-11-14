@@ -121,7 +121,7 @@ class MCParticle : public Branch {
     id
   };
   RecordBuilder<
-    RecordField<Field::id, ListOffsetBuilder<std::size_t, NumpyBuilder<long unsigned int>>>
+    RecordField<Field::id, ListOffsetBuilder<int64_t, NumpyBuilder<long unsigned int>>>
   > builder_;
   static std::map<std::size_t, std::string> field_names;
  public:
