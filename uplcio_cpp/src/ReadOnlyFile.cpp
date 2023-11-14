@@ -1,5 +1,7 @@
 #include "ReadOnlyFile.h"
 
+#include "ReadOnlyBranch.h"
+
 ReadOnlyFile::ReadOnlyFile(
     const std::string& filepath,
     bool use_only_first_event_for_collections
@@ -42,7 +44,48 @@ pybind11::object ReadOnlyFile::load_collections(
     int max_read,
     bool none_is_empty
 ) {
-  return {};
+  if (n_skip > 0) {
+#ifdef DEBUG
+    std::cout << "skipping " << n_skip << " events" << std::endl;
+#endif
+    reader_->skipNEvents(n_skip);
+  }
+  int event_count{0};
+  lcio::LCEvent* event{0};
+#ifdef DEBUG
+  std::cout << "branch init" << std::endl;
+#endif
+  std::map<std::string,std::unique_ptr<ReadOnlyBranch>> branches;
+  branches.emplace("header", ReadOnlyBranch::create("EventHeader"));
+#ifdef DEBUG
+  std::cout << "begin reading branches" << std::endl;
+#endif
+  while((event = reader_->readNextEvent()) != 0 and event_count++ < max_read) {
+    for (auto& [name, branch] : branches) {
+      branch->append(event, name);
+    }
+  }
+#ifdef DEBUG
+  std::cout << "done reading branches" << std::endl;
+#endif
+  // TODO: do we need to reset the file state somehow?
+  // in order to allow re-reading without re-opening (e.g. getting a few more branches)
+  // we would need to update the state of the file
+#ifdef DEBUG
+  std::cout << "converting branch builders to ak.Arrays" << std::endl;
+#endif
+  std::map<std::string,pybind11::object> converted_branches;
+  for (auto& [name, branch] : branches) {
+#ifdef DEBUG
+    std::cout << "  " << name << std::endl;
+#endif
+    converted_branches[name] = branch->snapshot();
+  }
+#ifdef DEBUG
+  std::cout << "zipping branches together" << std::endl;
+#endif
+  auto zip = pybind11::module::import("awkward").attr("zip");
+  return zip(converted_branches);
 }
 
 pybind11::object ReadOnlyFile::load_runs() {
