@@ -1,4 +1,3 @@
-. ~/.profile
 # build cpp
 build() {
   pip install --verbose --user uplcio_cpp/
