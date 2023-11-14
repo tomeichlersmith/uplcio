@@ -1,5 +1,7 @@
 Load LCIO files directly into in-memory awkward arrays.
 
+# Alpha Stage
+
 The on-disk bit format is not well documented, I literally can't find it anywhere, so I think that means we will have to fall back to using the LCIO C++ library itself in a backend python module. This isn't a large loss since Awkward has a header-only distribution of "builders" that can be put into a python module via pybind11.
 
 ## Roadmap
