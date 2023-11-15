@@ -56,7 +56,8 @@ pybind11::object ReadOnlyFile::load_collections(
   std::cout << "branch init" << std::endl;
 #endif
   std::map<std::string,std::unique_ptr<ReadOnlyBranch>> branches;
-  branches.emplace("header", ReadOnlyBranch::create("EventHeader"));
+  branches.emplace("header", ReadOnlyBranch::Factory::get().create("EventHeader"));
+  branches.emplace("MCParticle", ReadOnlyBranch::Factory::get().create("MCParticle"));
 #ifdef DEBUG
   std::cout << "begin reading branches" << std::endl;
 #endif

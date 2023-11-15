@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <pybind11/pybind11.h>
 
 #include <lcio.h>
@@ -14,6 +16,42 @@ class ReadOnlyBranch {
   virtual ~ReadOnlyBranch() = default;
   virtual void append(lcio::LCCollection* collection) = 0;
   virtual pybind11::object snapshot() = 0;
-  virtual void append(lcio::LCEvent* event, const std::string& collection_name);
-  static std::unique_ptr<ReadOnlyBranch> create(const std::string& type_name);
+  virtual void append(lcio::LCEvent* event, const std::string& collection_name) {
+    append(event->getCollection(collection_name));
+  }
+  class Factory {
+    template<class BranchType>
+    static std::unique_ptr<ReadOnlyBranch> maker() {
+      return std::make_unique<BranchType>();
+    }
+    std::map<std::string, std::unique_ptr<ReadOnlyBranch>(*)()> library_;
+    Factory() = default;
+   public:
+    static Factory& get() {
+      static Factory instance_;
+      return instance_;
+    }
+    std::unique_ptr<ReadOnlyBranch> create(const std::string& type_name) {
+      auto lib_it{library_.find(type_name)};
+      if (lib_it == library_.end()) {
+        throw std::runtime_error("Object of type "+type_name+" has not been declared");
+      }
+      return lib_it->second();
+    }
+    template<class BranchType>
+    uint64_t declare(const std::string& type_name) {
+      auto lib_it{library_.find(type_name)};
+      if (lib_it != library_.end()) {
+        throw std::runtime_error("An object named " + type_name +
+            " has already been declared.");
+      }
+      library_[type_name] = &maker<BranchType>;
+      return reinterpret_cast<std::uintptr_t>(&library_);
+    }
+  };
 };
+
+#define BRANCH_TYPE(CLASS) \
+  namespace { \
+    auto v = ::ReadOnlyBranch::Factory::get().declare<CLASS>(#CLASS); \
+  }

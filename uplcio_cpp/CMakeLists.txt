@@ -42,8 +42,8 @@ pybind11_add_module(
   src/uplcio_cpp.cpp
   src/demo.cpp
   src/ReadOnlyFile.cpp
-  src/ReadOnlyBranch.cpp
   src/EventHeader.cpp
+  src/MCParticle.cpp
 )
 target_link_libraries(uplcio_cpp PRIVATE awkward::layout-builder ${LCIO_LIBRARIES})
 target_include_directories(uplcio_cpp PRIVATE src ${LCIO_INCLUDE_DIR})
