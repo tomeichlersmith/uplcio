@@ -31,27 +31,27 @@ class ReadOnlyBranch {
       static Factory instance_;
       return instance_;
     }
-    std::unique_ptr<ReadOnlyBranch> create(const std::string& type_name) {
-      auto lib_it{library_.find(type_name)};
+    std::unique_ptr<ReadOnlyBranch> create(const std::string& name) {
+      auto lib_it{library_.find(name)};
       if (lib_it == library_.end()) {
-        throw std::runtime_error("Object of type "+type_name+" has not been declared");
+        throw std::runtime_error("Object of type "+name+" has not been declared");
       }
       return lib_it->second();
     }
     template<class BranchType>
-    uint64_t declare(const std::string& type_name) {
-      auto lib_it{library_.find(type_name)};
+    uint64_t declare(const std::string& name) {
+      auto lib_it{library_.find(name)};
       if (lib_it != library_.end()) {
-        throw std::runtime_error("An object named " + type_name +
+        throw std::runtime_error("An object named " + name +
             " has already been declared.");
       }
-      library_[type_name] = &maker<BranchType>;
+      library_[name] = &maker<BranchType>;
       return reinterpret_cast<std::uintptr_t>(&library_);
     }
   };
 };
 
-#define BRANCH_TYPE(CLASS) \
+#define BRANCH_TYPE(CLASS,NAME) \
   namespace { \
-    auto v = ::ReadOnlyBranch::Factory::get().declare<CLASS>(#CLASS); \
+    auto v = ::ReadOnlyBranch::Factory::get().declare<CLASS>(NAME); \
   }

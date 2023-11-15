@@ -36,4 +36,4 @@ std::map<std::size_t, std::string> MCParticle::field_names = {
   {Field::id, "id"}
 };
 
-BRANCH_TYPE(MCParticle)
+BRANCH_TYPE(MCParticle, EVENT::LCIO::MCPARTICLE)

@@ -38,4 +38,4 @@ std::map<std::size_t,std::string> EventHeader::field_names = {
   {Field::weight, "weight"}
 };
 
-BRANCH_TYPE(EventHeader)
+BRANCH_TYPE(EventHeader,"EventHeader")
