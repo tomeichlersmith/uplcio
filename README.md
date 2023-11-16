@@ -9,12 +9,30 @@ Roughly in order, may not be tackled in order if other roadblocks or new ideas a
 - [x] set up two-tier package structure a la awkward
 
 ### _Assuming system install of LCIO_
+Basic operations that show ability to parse file and construct a regular array.
+
 - [x] read event headers written by simjob
 - [ ] read run headers written by simjob
 - [ ] read collection names (and their types)
-- [ ] select events by index range
+
+#### Priority Collection Types
+As a first pass, not going to attempt to implement all of the LCIO Event objects.
+[The full list](https://ilcsoft.desy.de/LCIO/current/doc/doxygen_api/html/classEVENT_1_1LCObject.html)
+is quite long and so I'm going to focus on a core set related to my work on HPS.
+
+- [ ] MCParticle
+- [ ] SimTrackerHit
+- [ ] SimCalorimeterHit
+- [ ] LCGenericObject
+- [ ] TrackerHit
+- [ ] Track (with optional LCRelations to define additional data?)
+- [ ] CalorimeterHit
+- [ ] Cluster
+- [ ] ReconstructedParticle
+- [ ] TrackState
 
 ### _Expanding Usability_
+- [ ] select events by index range
 - [ ] pass `LCIO_DIR` into `uplcio_cpp` build
 - [ ] add LCIO as another `FetchContent` option
 - [ ] investigate LCIO schema evolution - can one build of `uplcio_cpp` handle multiple LCIO schema versions?
