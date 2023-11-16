@@ -14,8 +14,11 @@ Basic operations that show ability to parse file and construct a regular array.
 - [x] read event headers written by simjob
 - [ ] read run headers written by simjob
 - [ ] read collection names (and their types)
+- [ ] cross-collection referencing behavior in awkward[^1]
 
-#### Priority Collection Types
+[^1]: Necessary for LCRelations as well as other "constituent" relations (like track hits making up a track). The [physlite behaviors](https://github.com/CoffeaTeam/coffea/blob/master/src/coffea/nanoevents/methods/physlite.py) in coffea seem to implement this cross-collection referencing behavior that I would like (this implementation looks like they store a reference to the full event array and its indices and then can return referenced collections from sub-collections by using these references passed around).
+
+### Priority Collection Types
 As a first pass, not going to attempt to implement all of the LCIO Event objects.
 [The full list](https://ilcsoft.desy.de/LCIO/current/doc/doxygen_api/html/classEVENT_1_1LCObject.html)
 is quite long and so I'm going to focus on a core set related to my work on HPS.
