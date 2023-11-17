@@ -123,5 +123,25 @@ pybind11::object ReadOnlyFile::load_collections(
 }
 
 pybind11::object ReadOnlyFile::load_runs() {
+  OpenedFile op(*reader_, filepath_);
+  EVENT::LCRunHeader* run_header{0};
+  std::vector<long int> number;
+  std::vector<std::string> detector_name;
+  std::vector<std::string> description;
+  std::vector<std::vector<std::string>> active_subdetectors;
+  while((run_header = reader_->readNextRunHeader()) != 0) {
+    number.push_back(run_header->getRunNumber());
+    detector_name.push_back(run_header->getDetectorName());
+    description.push_back(run_header->getDescription());
+    auto asds{run_header->getActiveSubdetectors()};
+    active_subdetectors.emplace_back();
+    if (asds != nullptr) {
+      active_subdetectors.back().reserve(asds->size()); 
+      for (const std::string& sd : *asds) {
+        active_subdetectors.back().push_back(sd);
+      }
+    }
+  }
+  // need to convert into something pythonic
   return {};
 }
