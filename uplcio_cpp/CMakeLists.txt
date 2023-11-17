@@ -39,7 +39,7 @@ set(LCIO_LIBRARIES ${LCIO_LIBRARY} ${SIO_LIBRARY})
 # Build demo module
 pybind11_add_module(
   uplcio_cpp
-  src/uplcio_cpp.cpp
+  src/python.cpp
   src/demo.cpp
   src/ReadOnlyFile.cpp
   src/EventHeader.cpp
