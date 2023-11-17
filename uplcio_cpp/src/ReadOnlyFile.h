@@ -16,6 +16,10 @@
  * so I'm falling back to just wrapping all calls to the reading the file as open/close
  */
 class ReadOnlyFile {
+  /// number of events in the file we are reading
+  int num_events_;
+  /// number of runs in the file we are reading
+  int num_runs_;
   /// the file we are reading
   std::string filepath_;
   /// our reader instance
@@ -91,7 +95,7 @@ class ReadOnlyFile {
    * Load the runs into memory and format build them into
    * an awkward array
    *
-   * @return pybind11::object that is meant to be an ak.Array
+   * @return pybind11::dict that is meant to be an ak.Array
    */
-  pybind11::object load_runs();
+  pybind11::dict load_runs();
 };

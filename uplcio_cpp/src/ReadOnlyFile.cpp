@@ -36,6 +36,9 @@ ReadOnlyFile::ReadOnlyFile(
    * https://github.com/iLCSoft/LCIO/blob/93aff553188450715410bf541066afa3f0a6dbb0/src/cpp/src/MT/LCReader.cc#L32-L37
    */
   collections_ = get_collections(use_only_first_event_for_collections, true);
+  OpenedFile op(*reader_, filepath_);
+  num_events_ = reader_->getNumberOfEvents();
+  num_runs_ = reader_->getNumberOfRuns();
 }
 
 ReadOnlyFile::~ReadOnlyFile() {}
@@ -82,11 +85,11 @@ const std::unordered_map<std::string,std::string>& ReadOnlyFile::get_collections
 }
 
 int ReadOnlyFile::get_num_events() {
-  return reader_->getNumberOfEvents();
+  return num_events_;
 }
 
 int ReadOnlyFile::get_num_runs() {
-  return reader_->getNumberOfRuns();
+  return num_runs_;
 }
 
 pybind11::object ReadOnlyFile::load_collections(
@@ -122,7 +125,7 @@ pybind11::object ReadOnlyFile::load_collections(
   return zip(converted_branches);
 }
 
-pybind11::object ReadOnlyFile::load_runs() {
+pybind11::dict ReadOnlyFile::load_runs() {
   OpenedFile op(*reader_, filepath_);
   EVENT::LCRunHeader* run_header{0};
   std::vector<long int> number;
@@ -142,6 +145,10 @@ pybind11::object ReadOnlyFile::load_runs() {
       }
     }
   }
-  // need to convert into something pythonic
-  return {};
+  return pybind11::dict(
+      pybind11::arg("number") = number,
+      pybind11::arg("detector_name") = detector_name,
+      pybind11::arg("description") = description,
+      pybind11::arg("active_subdetectors") = active_subdetectors
+  );
 }
