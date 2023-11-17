@@ -11,8 +11,13 @@
 
 /**
  * Central wrapper around LCIO to help bind it to python
+ *
+ * There is no "seek-back" mechanism that I can find in the LCIO+SIO implementation,
+ * so I'm falling back to just wrapping all calls to the reading the file as open/close
  */
 class ReadOnlyFile {
+  /// the file we are reading
+  std::string filepath_;
   /// our reader instance
   std::unique_ptr<lcio::LCReader> reader_;
   /// list of collections in our file (and their type strings)
@@ -31,7 +36,7 @@ class ReadOnlyFile {
    */
   ReadOnlyFile(
       const std::string& filepath,
-      bool use_only_first_event_for_collections
+      bool use_only_first_event_for_collections = false
   );
 
   /**
@@ -47,8 +52,8 @@ class ReadOnlyFile {
    * @return vector of collection names, newly allocated
    */
   const std::unordered_map<std::string,std::string>& get_collections(
-      bool use_only_first_event_for_collections,
-      bool reread
+      bool use_only_first_event_for_collections = false,
+      bool reread = false
   );
 
   /**
@@ -71,15 +76,15 @@ class ReadOnlyFile {
    *
    * @param[in] to_load names of collections to load into memory
    * @param[in] n_skip number of events at beginning of file to skip
-   * @param[in] max_read maximum number of events to read
+   * @param[in] max_read maximum number of events to read (read all events if negative)
    * @param[in] none_is_empty silently interpret missing collections as empty
    * @return pybind11::object that is meant to be an ak.Array
    */
   pybind11::object load_collections(
-      const std::vector<std::string>& to_load,
-      int n_skip,
-      int max_read,
-      bool none_is_empty
+      const std::vector<std::string>& to_load = {},
+      int n_skip = 0,
+      int max_read = -1,
+      bool none_is_empty = true
   );
 
   /**
