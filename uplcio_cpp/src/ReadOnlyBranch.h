@@ -75,7 +75,13 @@ class ReadOnlyBranch {
   virtual void append(lcio::LCCollection* collection) = 0;
   virtual pybind11::object snapshot() = 0;
   virtual void append(lcio::LCEvent* event, const std::string& collection_name) {
-    append(event->getCollection(collection_name));
+    try {
+      append(event->getCollection(collection_name));
+    } catch (const lcio::DataNotAvailableException&) {
+      // TODO: implement method to pass user's choice on how to handle this case
+      // now, I am doing what I want which is just an empty collection
+      append(nullptr);
+    }
   }
   class Factory {
     template<class BranchType>
