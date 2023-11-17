@@ -13,7 +13,7 @@ Basic operations that show ability to parse file and construct a regular array.
 
 - [x] read event headers written by simjob
 - [ ] read run headers written by simjob
-- [ ] read collection names (and their types)
+- [x] read collection names (and their types)
 - [ ] cross-collection referencing behavior in awkward[^1]
 
 [^1]: Necessary for LCRelations as well as other "constituent" relations (like track hits making up a track). The [physlite behaviors](https://github.com/CoffeaTeam/coffea/blob/master/src/coffea/nanoevents/methods/physlite.py) in coffea seem to implement this cross-collection referencing behavior that I would like (this implementation looks like they store a reference to the full event array and its indices and then can return referenced collections from sub-collections by using these references passed around).
@@ -35,7 +35,7 @@ is quite long and so I'm going to focus on a core set related to my work on HPS.
 - [ ] TrackState
 
 ### _Expanding Usability_
-- [ ] select events by index range
+- [x] select events by index range
 - [ ] pass `LCIO_DIR` into `uplcio_cpp` build
 - [ ] add LCIO as another `FetchContent` option
 - [ ] investigate LCIO schema evolution - can one build of `uplcio_cpp` handle multiple LCIO schema versions?
