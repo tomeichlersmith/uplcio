@@ -35,3 +35,9 @@ def test_partial_reads(simjob_filepath):
     assert ak.all(headers.EventHeader.number == np.arange(0,10,1))
     assert ak.all(headers.EventHeader.run == 1)
 
+
+def test_run_header(simjob_filepath):
+    f = uplcio.ReadOnlyFile(simjob_filepath)
+    runs = ak.Array(f.load_runs())
+    assert ak.all(runs.number == np.arange(0,10,1))
+    assert ak.all(runs.detector_name == 'D09TileHcal')
