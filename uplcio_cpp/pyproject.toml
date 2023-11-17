@@ -7,7 +7,7 @@ name = "uplcio_cpp"
 version = "0"
 
 dependencies = [
-  'awkward>=2.0',
+  'awkward>=2.5',
   "numpy"
 ]
 

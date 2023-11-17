@@ -12,7 +12,7 @@ message(STATUS "${CMAKE_CURRENT_DIR}")
 
 # Download headers
 include(FetchContent)
-set(AWKWARD_VERSION "v2.4.3")
+set(AWKWARD_VERSION "v2.5.0")
 FetchContent_Declare(
   awkward-headers
   URL https://github.com/scikit-hep/awkward/releases/download/${AWKWARD_VERSION}/header-only.zip

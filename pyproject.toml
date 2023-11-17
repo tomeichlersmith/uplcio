@@ -17,7 +17,7 @@ classifiers = [
 ]
 dependencies = [
   "uplcio_cpp==0",
-  "awkward>=2"
+  "awkward>=2.5"
 ]
 
 [project.optional-dependencies]
