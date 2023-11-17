@@ -1,6 +1,4 @@
 #include "ReadOnlyBranch.h"
-#include "snapshot.h"
-#include "layout_builder_common.h"
 
 class EventHeader : public ReadOnlyBranch {
   enum Field : std::size_t {

@@ -1,6 +1,4 @@
 #include "ReadOnlyBranch.h"
-#include "snapshot.h"
-#include "layout_builder_common.h"
 
 #include <EVENT/MCParticle.h>
 

@@ -40,7 +40,6 @@ set(LCIO_LIBRARIES ${LCIO_LIBRARY} ${SIO_LIBRARY})
 pybind11_add_module(
   uplcio_cpp
   src/python.cpp
-  src/demo.cpp
   src/ReadOnlyFile.cpp
   src/EventHeader.cpp
   src/MCParticle.cpp
