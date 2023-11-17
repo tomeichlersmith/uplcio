@@ -12,7 +12,7 @@ Roughly in order, may not be tackled in order if other roadblocks or new ideas a
 Basic operations that show ability to parse file and construct a regular array.
 
 - [x] read event headers written by simjob
-- [ ] read run headers written by simjob
+- [x] read run headers written by simjob
 - [x] read collection names (and their types)
 - [ ] cross-collection referencing behavior in awkward[^1]
 
