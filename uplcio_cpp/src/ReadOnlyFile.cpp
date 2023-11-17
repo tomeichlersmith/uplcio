@@ -1,6 +1,7 @@
 #include "ReadOnlyFile.h"
-
 #include "ReadOnlyBranch.h"
+
+#include <EVENT/LCEvent.h>
 
 ReadOnlyFile::ReadOnlyFile(
     const std::string& filepath,
@@ -17,17 +18,47 @@ ReadOnlyFile::ReadOnlyFile(
    * https://github.com/iLCSoft/LCIO/blob/93aff553188450715410bf541066afa3f0a6dbb0/src/cpp/src/MT/LCReader.cc#L32-L37
    */
   reader_->open(filepath);
-  collections_ = get_collections(use_only_first_event_for_collections);
+  collections_ = get_collections(use_only_first_event_for_collections, true);
 }
 
 ReadOnlyFile::~ReadOnlyFile() {
   reader_->close();
 }
 
-std::vector<std::string> ReadOnlyFile::get_collections(
-    bool use_only_first_event_for_collections
+const std::unordered_map<std::string,std::string>& ReadOnlyFile::get_collections(
+    bool use_only_first_event_for_collections,
+    bool reread
 ) {
-  return {};
+  if (collections_.empty() and not reread) 
+    return collections_;
+
+  auto get_collections_from_event = [&](const EVENT::LCEvent* event) {
+    /**
+     * While LCEvent::getCollectionNames technically returns a pointer,
+     * it is actually returning the address of one of its member variables,
+     * so we skip any validity check.
+     */
+    const auto* collection_names = event->getCollectionNames();
+    for (const auto& name : *collection_names) {
+      if (collections_.find(name) == collections_.end()) {
+        // new collection, need to load it so we can get its type string
+        auto collection = event->getCollection(name);
+        collections_[name] = collection->getTypeName();
+      }
+    }
+    return;
+  };
+
+  if (use_only_first_event_for_collections) {
+    const auto event = reader_->readNextEvent();
+    get_collections_from_event(event);
+    return collections_;
+  } 
+
+  while(const auto event = reader_->readNextEvent()) {
+    get_collections_from_event(event);
+  }
+  return collections_;
 }
 
 int ReadOnlyFile::get_num_events() {

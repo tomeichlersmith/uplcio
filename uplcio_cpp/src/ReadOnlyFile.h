@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
@@ -13,8 +15,8 @@
 class ReadOnlyFile {
   /// our reader instance
   std::unique_ptr<lcio::LCReader> reader_;
-  /// list of collections in our file
-  std::vector<std::string> collections_;
+  /// list of collections in our file (and their type strings)
+  std::unordered_map<std::string, std::string> collections_;
  public:
   /**
    * prepare ourselves to read the input file
@@ -41,10 +43,12 @@ class ReadOnlyFile {
    * Retreive the list of collections within the file.
    *
    * @param[in] use_only_first_event_for_collections if true, only check first event for collection listing
+   * @param[in] reread if true, will reread collections even if we already have a collections map
    * @return vector of collection names, newly allocated
    */
-  std::vector<std::string> get_collections(
-      bool use_only_first_event_for_collections
+  const std::unordered_map<std::string,std::string>& get_collections(
+      bool use_only_first_event_for_collections,
+      bool reread
   );
 
   /**
