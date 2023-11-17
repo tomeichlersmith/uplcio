@@ -7,6 +7,4 @@ install() {
   build && pip install --user --editable .[test]
 }
 # run tests
-test() {
-  ~/.local/bin/pytest
-}
+alias test='~/.local/bin/pytest'
