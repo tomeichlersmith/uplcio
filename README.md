@@ -1,10 +1,21 @@
 Load LCIO files directly into in-memory awkward arrays.
 
-# Alpha Stage
+# Abandoned
 
-The on-disk bit format is not well documented, I literally can't find it anywhere, so I think that means we will have to fall back to using the LCIO C++ library itself in a backend python module. This isn't a large loss since Awkward has a header-only distribution of "builders" that can be put into a python module via pybind11.
+I got pretty far with implementing this as a proof-of-concept but I reached an issue that I am unable to rectify (detail below). Hopefully this half-finished project will be helpful for someone else in the future.
+
+## Core Issue: LCRelations
+A major part of the LCIO format is "relations" between objects. In some cases, this means one object is another object's parent ("constiuent" relations, e.g. a track is related to the hits that make it) or could mean "extra" information that may not always be needed ("LCRelation", e.g. a track fit may yield data about the kinks in the track which would only be necessary if a user wishes to study how the track fit is doing). Relationships like these break the tree-structure of an awkward array, but we can still implement them by using indices and implementing special behaviors (or manually changing the form) - this was discussed in [a scikit-hep/awkward discussion](https://github.com/scikit-hep/awkward/discussions/2838). The core issue is that LCIO implements relations like these _not_ as indices but as pointers in C++. This pointer-based implementation works well on the C++ side, but suffers when trying to translate it to another format in memory. This leaves me with a few options.
+
+1. On each event during translation, construct a map of all `LCObject*` pointers in the event to their collection name and index in that collection. Make this mapping available to all `ReadOnlyBranch`es so that they can translate any constiuent relations or `LCRelation`s that may come up into a look-up ID that can be used on the `awkward` side in python. This has the benefit of maintaining the structure of the LCIO data (as best we can) but has a significant overhead cost for each event.
+2. Abandon translation of references from LCIO and adopt an ownership-only model. Constiuent relations are stored directly as members of the owning object and `LCRelation`s copy the `to` object into the `from` object. This avoids this cost of constructing a look-up map, but leads to a confusing relationship between the LCIO data and the in-memory `awkward` data.
+
+Neither of these "solutions" are very satisfying to me and so I'm abandoning this project at this stage. Perhaps a person with more knowledge about the LCIO format or its code base will be able to offer a nicer solution to this problem, but for now I am not working on it.
+
 
 ## Roadmap
+The on-disk bit format is not well documented, I literally can't find it anywhere, so I think that means we will have to fall back to using the LCIO C++ library itself in a backend python module. This isn't a large loss since Awkward has a header-only distribution of "builders" that can be put into a python module via pybind11.
+
 Roughly in order, may not be tackled in order if other roadblocks or new ideas arise.
 - [x] set up two-tier package structure a la awkward
 
